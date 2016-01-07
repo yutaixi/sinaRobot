@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.wowdb.wowdata.schedule.dao.api.IScheduleDao">  
+
+ <sql id="queryJobBase">
+     select t.id,t.code jobCode,t.description description,t.job_type jobType,
+      t.cron_string cron,t.class_name classname,t.status status,
+      t.start_time startTime,t.end_time endTime,t.creation_date createdDate,
+      t.created_by createdBy,t.last_update_date lastUpdateDate,
+      t.last_updated_by lastUpdatedBy,t.max_run_count maxRunCount
+      from yop_job_def t
+      where 1=1
+ </sql>
+ <select id="findJob" resultType="com.wowdb.wowdata.schedule.JobVO">
+       <include refid="queryJobBase"/>
+      <if test="jobVO.jobType != null">
+         and t.job_type=#{jobVO.jobType}
+      </if>
+       <if test="jobVO.status != null">
+         and  t.status=#{jobVO.status}
+      </if>
+     <if test="jobVO.jobCode != null">
+          and t.code=#{jobVO.jobCode}
+      </if>
+      
+  </select>
+  
+  <update id="updateJob">
+  update yop_job_def t
+     set t.description=#{jobVO.description,jdbcType=VARCHAR},
+     t.cron_string=#{jobVO.cron,jdbcType=VARCHAR},
+     t.status=#{jobVO.status,jdbcType=VARCHAR},
+     t.start_time=#{jobVO.startTime,jdbcType=DATE},
+     t.end_time=#{jobVO.endTime,jdbcType=DATE},
+     t.max_run_count=#{jobVO.maxRunCount,jdbcType=NUMERIC},
+     t.last_update_date=sysdate,
+     t.last_updated_by=#{jobVO.lastUpdatedBy,jdbcType=VARCHAR}
+     where 1=1
+     and t.id=#{jobVO.id}
+  </update>
+  
+  <select id="getJobByCode" resultType="com.wowdb.wowdata.schedule.JobVO">
+	<include refid="queryJobBase"/>
+	and t.code=#{jobCode}
+	and rownum=1
+  </select>
+
+   <select id="hasReadyStatus" resultType="com.wowdb.wowdata.schedule.JobVO">
+	select def.id,
+	def.code jobCode,
+	def.cron_string cron,
+	def.max_run_count maxRunCount
+	from yop_job_def def
+	inner join yop_job_call jobcall
+	on jobcall.job_id = def.id
+	where 1 = 1
+	and def.code =#{jobCode}
+	and jobcall.status='READY'
+	and rownum = 1
+
+	
+  </select>
+
+</mapper>  

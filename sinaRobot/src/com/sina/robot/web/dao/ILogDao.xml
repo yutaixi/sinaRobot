@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.wowdb.log.dao.api.ILogDao">  
+
+    <insert id="insert">
+	insert into YOP_DATA_LOG t
+	(
+	id,
+	who,
+	what,
+	when,
+	type,
+	cost
+	)
+	values(
+	seq_yop_data_log.nextval,
+	#{logVO.who,jdbcType=VARCHAR},
+	#{logVO.what,jdbcType=VARCHAR},
+	sysdate,
+	#{logVO.type,jdbcType=VARCHAR},
+	#{logVO.cost,jdbcType=NUMERIC}
+	)
+    </insert>
+ 
+</mapper>  

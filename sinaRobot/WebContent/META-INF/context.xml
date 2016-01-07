@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<Context>  
+      <Resource name="jdbc/wowdbDS"
+      auth="Container"
+	  type="javax.sql.DataSource"
+	  username="wower"
+	  password="wowdb"
+	  driverClassName="oracle.jdbc.driver.OracleDriver11"
+	  url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.116.129)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=wower)(SERVER=DEDICATED)))"
+	  maxActive="10"
+	  maxIdle="3"
+	  maxWait="10000" />
+</Context>  

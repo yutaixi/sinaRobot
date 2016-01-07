@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.wowdb.wowdata.dao.api.IWowGuildDao">  
+
+ 
+ <insert id="batchCreateOrUpdateGuild">
+       begin
+       <foreach item="item" index="index" collection="guilds">
+          MERGE INTO WOWDB_GUILD guild
+          USING (SELECT 1 FROM DUAL) P
+          ON (guild.name= #{guildVO.name} and guild.REALM= #{guildVO.realm})
+          WHEN MATCHED THEN
+          UPDATE
+               set 
+                   guild.BATTLEGROUP=#{item.battlegroup,jdbcType=VARCHAR},
+                   guild.MEMBERCOUNT=#{item.memberCount,jdbcType=NUMERIC},
+                   guild.ACHIEVEMENTPOINTS=#{item.achievementPoints,jdbcType=NUMERIC},
+                   guild.LEVELS=#{item.level,jdbcType=NUMERIC},
+                   guild.SIDE=#{item.side,jdbcType=NUMERIC},
+                   guild.LASTMODIFIED=#{item.lastModified,jdbcType=TIMESTAMP},
+                   guild.LAST_UPDATE_DATE=sysdate,
+                   guild.LAST_UPDATED_BY='sys'
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              NAME,
+              REALM,
+              BATTLEGROUP,
+              MEMBERCOUNT,
+              ACHIEVEMENTPOINTS,
+              EMBLEM,
+              LEVELS,
+              SIDE,
+              LASTMODIFIED,
+              CREATION_DATE,
+              CREATED_BY,
+              LAST_UPDATE_DATE,
+              LAST_UPDATED_BY
+             )
+             VALUES
+             (
+              #{item.id,jdbcType=NUMERIC},
+              #{item.name,jdbcType=NUMERIC},
+              #{item.realm,jdbcType=NUMERIC},
+              #{item.battlegroup,jdbcType=NUMERIC},
+              #{item.memberCount,jdbcType=NUMERIC},
+              #{item.achievementPoints,jdbcType=NUMERIC},
+              #{item.emblemId,jdbcType=NUMERIC},
+              #{item.level,jdbcType=NUMERIC},
+              #{item.side,jdbcType=NUMERIC},
+              #{item.lastModified,jdbcType=DATE},
+              sysdate,
+              'sys',
+              sysdate,
+              'sys'
+             );
+        </foreach>
+     end;
+ </insert>
+<insert id="createOrUpdateGuild">
+          MERGE INTO WOWDB_GUILD guild
+          USING (SELECT 1 FROM DUAL) P
+          ON (guild.name= #{guildVO.name} and guild.REALM= #{guildVO.realm})
+          WHEN MATCHED THEN
+          UPDATE
+               set
+                   guild.BATTLEGROUP=#{guildVO.battlegroup,jdbcType=VARCHAR},
+                   guild.MEMBERCOUNT=#{guildVO.memberCount,jdbcType=NUMERIC},
+                   guild.ACHIEVEMENTPOINTS=#{guildVO.achievementPoints,jdbcType=NUMERIC},
+                   guild.LEVELS=#{guildVO.level,jdbcType=NUMERIC},
+                   guild.SIDE=#{guildVO.side,jdbcType=NUMERIC},
+                   guild.LASTMODIFIED=#{guildVO.lastModified,jdbcType=TIMESTAMP},
+                   guild.LAST_UPDATE_DATE=sysdate,
+                   guild.LAST_UPDATED_BY='sys'
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              NAME,
+              REALM,
+              BATTLEGROUP,
+              MEMBERCOUNT,
+              ACHIEVEMENTPOINTS,
+              EMBLEM,
+              LEVELS,
+              SIDE,
+              LASTMODIFIED,
+              CREATION_DATE,
+              CREATED_BY,
+              LAST_UPDATE_DATE,
+              LAST_UPDATED_BY
+             )
+             VALUES
+             (
+              SEQ_WOW_GUILD.Nextval,
+              #{guildVO.name,jdbcType=VARCHAR},
+              #{guildVO.realm,jdbcType=VARCHAR},
+              #{guildVO.battlegroup,jdbcType=VARCHAR},
+              #{guildVO.memberCount,jdbcType=NUMERIC},
+              #{guildVO.achievementPoints,jdbcType=NUMERIC},
+              #{guildVO.emblemId,jdbcType=NUMERIC},
+              #{guildVO.level,jdbcType=NUMERIC},
+              #{guildVO.side,jdbcType=NUMERIC},
+              #{guildVO.lastModified,jdbcType=DATE},
+              sysdate,
+              'sys',
+              sysdate,
+              'sys'
+             )
+ </insert>
+
+<select id="getGuildRank" resultType="com.wowdb.wowdata.AchievementComVO">
+	select * from (
+	select p.*, rownum rn from (
+	select t.guild_name name,t.guild_realm realm,t.complete_date completeDate
+	from wowdb_guild_achieve_compl t
+	where 1=1
+	and t.achieve_id=#{searchVO.rankKeyNum}
+	order by t.complete_date) p
+	where 
+	<![CDATA[
+	rownum<=#{pageVO.endIndex}
+	]]>
+	)
+	<![CDATA[
+	where rn>=#{pageVO.startIndex}
+	]]>
+</select>
+
+<sql id="queryGuildBase">
+
+    select t.name,t.realm,t.battlegroup battlegroup,t.membercount memberCount,
+    t.achievementpoints achievementPoints,t.levels levels,t.side  side
+    from WOWDB_GUILD t
+    where 1=1
+</sql>
+<select id="findGuild" resultMap="guildMap">
+    <include refid="queryGuildBase"/>
+    <if test="guild.realm != null">
+         and t.realm=#{guild.realm}
+    </if>
+    <if test="guild.name != null">
+        and t.name=#{guild.name}
+    </if>
+
+</select>
+<resultMap id="guildMap" type="com.wowdb.wowdata.GuildVO">
+	<id property="id" column="id" />
+	<result property="name" column="name" />
+	<result property="realm" column="realm" />
+	<result property="battlegroup" column="battlegroup" />
+	<result property="memberCount" column="memberCount" />
+	<result property="achievementPoints" column="achievementPoints" />
+	<result property="level" column="levels" />
+	<result property="side" column="side" />
+</resultMap>
+
+
+
+</mapper>  

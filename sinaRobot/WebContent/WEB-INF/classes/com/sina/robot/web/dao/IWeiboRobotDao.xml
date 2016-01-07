@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.sina.robot.dao.IWeiboRobotDao">  
+
+ 
+ <insert id="insertPublishedWeibo">
+ 	insert into SINA_WEIBO_PUBLISHED 
+    (
+      id,
+      MID,
+      TITLE,
+      TEXT,
+      OUID,
+      NICKNAME,
+      CREATION_DATE,
+      WEIBOID,
+      PICIDS,
+      SIMHASH
+    )values
+	(
+	seq_sina_weibo_published.NEXTVAL,
+	#{weiboItem.mid,jdbcType=VARCHAR},
+	#{weiboItem.title,jdbcType=VARCHAR},
+	#{weiboItem.text,jdbcType=VARCHAR},
+	#{weiboItem.ouid,jdbcType=VARCHAR},
+	#{weiboItem.nickName,jdbcType=VARCHAR},
+	sysdate,
+	#{weiboId,jdbcType=VARCHAR},
+	#{weiboItem.picIdStr,jdbcType=VARCHAR},
+	#{weiboItem.simHash,jdbcType=VARCHAR}
+	)
+  
+ </insert>
+   <select id="findWeibo" resultType="com.sina.weibo.WeiboItem">
+        select t.id,t.mid,t.title,t.text,t.ouid,t.nickname,t.simHash
+        from sina_weibo_published t
+        where 1=1
+        <if test="weiboItem.mid != null">
+         and t.mid=#{weiboItem.mid}
+        </if>
+        <if test="weiboItem.ouid != null">
+         and t.ouid=#{weiboItem.ouid}
+        </if> 
+         <if test="weiboId != null">
+         and t.WEIBOID=#{weiboId}
+        </if>
+  </select>   
+  
+  <select id="getWeiboCrawler" resultType="com.sina.weibo.WeiboCrawler">
+        select t.id,t.ouid,t.nic_name nicName,t.type
+        from sina_weibo_crawler_udi t
+        where 1=1
+        and t.type=#{weiboCrawler.type}  
+  </select>    
+  
+  <insert id="insertOrUpdatePublishedWeibo">
+       begin
+       <foreach item="item" index="index" collection="weiboList">
+          MERGE INTO sina_weibo_published  weiboPublish
+          USING (SELECT 1 FROM DUAL) P
+          ON (weiboPublish.MID= #{item.mid} and weiboPublish.WEIBOID=#{weiboId})
+          WHEN MATCHED THEN
+              UPDATE
+                 set   weiboPublish.LAST_UPDATE_DATE=sysdate
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (id,
+              MID,
+              TITLE,
+              TEXT,
+              OUID,
+              NICKNAME,
+              CREATION_DATE,
+              WEIBOID,
+              PICIDS,
+              PUBLISH_STATUS,
+              SIMHASH
+             )
+             VALUES
+             (
+              seq_sina_weibo_published.NEXTVAL,
+	          #{item.mid,jdbcType=VARCHAR},
+	          #{item.title,jdbcType=VARCHAR},
+	          #{item.text,jdbcType=VARCHAR},
+	          #{item.ouid,jdbcType=VARCHAR},
+	          #{item.nickName,jdbcType=VARCHAR},
+	          sysdate,
+	          #{weiboId,jdbcType=VARCHAR},
+	          #{item.picIdStr,jdbcType=VARCHAR},
+	          decode((select count(1) from sina_weibo_published w where w.SIMHASH=#{item.simHash,jdbcType=VARCHAR} and w.PUBLISH_STATUS in (0,1,2)),0,0,5),
+	          #{item.simHash,jdbcType=VARCHAR}
+             );
+        </foreach>
+     end;
+ </insert>
+
+
+
+ <select id="findWeibo2Publish" resultType="com.sina.weibo.WeiboItem"> 
+ select * from (
+      select t.id,t.mid,t.title,t.text,t.ouid,t.nickname,t.creation_date,t.weiboid,t.picids picIdStr,t.publish_status,t.simHash
+      from sina_weibo_published t
+      where 1=1 
+      and t.publish_status=0
+      and t.weiboid=#{weiboId,jdbcType=VARCHAR}
+      
+      order by t.id desc
+      ) where 
+       <![CDATA[
+        rownum <=10
+       ]]>
+  </select>  
+     <update id="updateWeiboSimHash">
+        UPDATE sina_weibo_published T
+         SET T.SIMHASH=#{weiboItem.simHash,jdbcType=VARCHAR}
+         WHERE T.ID =#{weiboItem.id,jdbcType=VARCHAR}
+   </update>  
+  
+   <update id="updateWeiboSyning">
+        UPDATE sina_weibo_published T
+         SET T.publish_status=1
+         WHERE T.ID IN 
+         <foreach item="item" index="index" collection="weiboList" open="(" separator="," close=")">
+             #{item.id}
+         </foreach>
+   </update>
+
+
+  <update id="updateWeiboSynDone">
+        UPDATE sina_weibo_published T
+         SET T.publish_status=2
+         WHERE T.ID = #{weiboItem.id}
+   </update>
+   
+   <update id="updateWeiboSynError">
+        UPDATE sina_weibo_published T
+         SET T.publish_status=4
+         WHERE T.ID = #{weiboItem.id}
+   </update>
+   
+    <update id="resetWeiboSynStatus">
+        UPDATE sina_weibo_published T
+         SET T.publish_status=0
+         WHERE T.publish_status = 1
+          
+   </update>
+   
+   
+   <select id="hasJobRunning" resultType="com.sina.weibo.WeiboItem"> 
+      select t.id,t.mid,t.text,t.ouid,t.nickname,t.weiboid,t.picids,t.publish_status
+      from SINA_WEIBO_PUBLISHED t 
+      where t.weiboid=#{loginPojo.username,jdbcType=VARCHAR}
+      and t.publish_status =1
+  </select>  
+</mapper>  

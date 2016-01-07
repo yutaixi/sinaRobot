@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.wowdb.wowdata.dao.api.IWowRealmDao">  
+
+ 
+ <insert id="createOrUpdateRealm">
+       begin
+       <foreach item="item" index="index" collection="realms">
+          MERGE INTO wowdb_realm  realm
+          USING (SELECT 1 FROM DUAL) P
+          ON (realm.NAME= #{item.name} and realm.SLUG=#{item.slug})
+          WHEN MATCHED THEN
+          UPDATE
+               set 
+                   realm.TYPE=#{item.type,jdbcType=VARCHAR},
+                   realm.POPULATION=#{item.population,jdbcType=VARCHAR},
+                   realm.QUEUE=#{item.queue,jdbcType=VARCHAR},
+                   realm.STATUS=#{item.status,jdbcType=VARCHAR},
+                   realm.BATTLEGROUP=#{item.battlegroup,jdbcType=VARCHAR},
+                   realm.LOCALE=#{item.locale,jdbcType=VARCHAR},
+                   realm.TIMEZONE=#{item.timezone,jdbcType=VARCHAR},
+                   realm.LAST_UPDATE_DATE=sysdate,
+                   realm.LAST_UPDATED_BY='sys'
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              NAME,
+              SLUG,
+              TYPE,
+              POPULATION,
+              QUEUE,
+              STATUS,
+              BATTLEGROUP,
+              LOCALE,
+              TIMEZONE,
+              CREATION_DATE,
+              CREATED_BY,
+              LAST_UPDATE_DATE,
+              LAST_UPDATED_BY
+             )
+             VALUES
+             (
+              SEQ_WOW_REALM.Nextval,
+              #{item.name,jdbcType=VARCHAR},
+              #{item.slug,jdbcType=VARCHAR},
+              #{item.type,jdbcType=VARCHAR},
+              #{item.population,jdbcType=VARCHAR},
+              #{item.queue,jdbcType=VARCHAR},
+              #{item.status,jdbcType=VARCHAR},
+              #{item.battlegroup,jdbcType=VARCHAR},
+              #{item.locale,jdbcType=VARCHAR},
+              #{item.timezone,jdbcType=VARCHAR},
+              sysdate,
+              'sys',
+              sysdate,
+              'sys'
+             );
+        </foreach>
+     end;
+ </insert>
+<insert id="createOrInsertRealmJson">
+          begin
+       <foreach item="item" index="index" collection="realms">
+          MERGE INTO wowdb_realm  realm
+          USING (SELECT 1 FROM DUAL) P
+          ON (realm.NAME= #{item.name} and realm.SLUG=#{item.slug})
+          WHEN MATCHED THEN
+          UPDATE
+               set 
+                   realm.TYPE=#{item.type,jdbcType=VARCHAR},
+                   realm.POPULATION=#{item.population,jdbcType=VARCHAR},
+                   realm.QUEUE=#{item.queue,jdbcType=VARCHAR},
+                   realm.STATUS=#{item.status,jdbcType=VARCHAR},
+                   realm.BATTLEGROUP=#{item.battlegroup,jdbcType=VARCHAR},
+                   realm.LOCALE=#{item.locale,jdbcType=VARCHAR},
+                   realm.TIMEZONE=#{item.timezone,jdbcType=VARCHAR},
+                   realm.LAST_UPDATE_DATE=sysdate,
+                   realm.LAST_UPDATED_BY='sys'
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              NAME,
+              SLUG,
+              TYPE,
+              POPULATION,
+              QUEUE,
+              STATUS,
+              BATTLEGROUP,
+              LOCALE,
+              TIMEZONE,
+              CREATION_DATE,
+              CREATED_BY,
+              LAST_UPDATE_DATE,
+              LAST_UPDATED_BY
+             )
+             VALUES
+             (
+              SEQ_WOW_REALM.Nextval,
+              #{item.name,jdbcType=VARCHAR},
+              #{item.slug,jdbcType=VARCHAR},
+              #{item.type,jdbcType=VARCHAR},
+              #{item.population,jdbcType=VARCHAR},
+              #{item.queue,jdbcType=VARCHAR},
+              #{item.status,jdbcType=VARCHAR},
+              #{item.battlegroup,jdbcType=VARCHAR},
+              #{item.locale,jdbcType=VARCHAR},
+              #{item.timezone,jdbcType=VARCHAR},
+              sysdate,
+              'sys',
+              sysdate,
+              'sys'
+             );
+        </foreach>
+     end;
+ </insert>
+
+</mapper>  

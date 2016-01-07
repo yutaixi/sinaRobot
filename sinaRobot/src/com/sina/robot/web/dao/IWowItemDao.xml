@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.wowdb.wowdata.dao.api.IWowDbDao">  
+
+ 
+ <insert id="insertOrUpdateItem">
+       begin
+       <foreach item="item" index="index" collection="itemList">
+          MERGE INTO WOWDB_ITEM wowItem
+          USING (SELECT 1 FROM DUAL) P
+          ON (wowItem.ID= #{item.id})
+          WHEN MATCHED THEN
+          UPDATE
+               set wowItem.description=#{item.description,jdbcType=VARCHAR},
+                   wowItem.name=#{item.name,jdbcType=VARCHAR},
+                   wowItem.icon=#{item.icon,jdbcType=VARCHAR},
+                   wowItem.stackable=#{item.stackable,jdbcType=VARCHAR},
+                   wowItem.itemBind=#{item.itemBind,jdbcType=VARCHAR},
+                   wowItem.buyPrice=#{item.buyPrice,jdbcType=VARCHAR},
+                   wowItem.itemClass=#{item.itemClass,jdbcType=VARCHAR},
+                   wowItem.itemSubClass=#{item.itemSubClass,jdbcType=VARCHAR},
+                   wowItem.containerSlots=#{item.containerSlots,jdbcType=VARCHAR},
+                   wowItem.inventoryType=#{item.inventoryType,jdbcType=VARCHAR},
+                   wowItem.equippable=#{item.equippable,jdbcType=VARCHAR},
+                   wowItem.itemLevel=#{item.itemLevel,jdbcType=VARCHAR},
+                   wowItem.maxCount=#{item.maxCount,jdbcType=VARCHAR},
+                   wowItem.maxDurability=#{item.maxDurability,jdbcType=VARCHAR},
+                   wowItem.minFactionId=#{item.minFactionId,jdbcType=VARCHAR},
+                   wowItem.minReputation=#{item.minReputation,jdbcType=VARCHAR},
+                   wowItem.quality=#{item.quality,jdbcType=VARCHAR},
+                   wowItem.sellPrice=#{item.sellPrice,jdbcType=VARCHAR},
+                   wowItem.requiredSkill=#{item.requiredSkill,jdbcType=VARCHAR},
+                   wowItem.requiredLevel=#{item.requiredLevel,jdbcType=VARCHAR},
+                   wowItem.requiredSkillRank=#{item.requiredSkillRank,jdbcType=VARCHAR},
+                   wowItem.baseArmor =#{item.baseArmor,jdbcType=VARCHAR},
+                   wowItem.hasSockets=#{item.hasSockets,jdbcType=VARCHAR},
+                   wowItem.isAuctionable=#{item.isAuctionable,jdbcType=VARCHAR},
+                   wowItem.armor=#{item.armor,jdbcType=VARCHAR},
+                   wowItem.displayInfoId =#{item.displayInfoId,jdbcType=VARCHAR},
+                   wowItem.nameDescription =#{item.nameDescription,jdbcType=VARCHAR},
+                   wowItem.nameDescriptionColor=#{item.nameDescriptionColor,jdbcType=VARCHAR},
+                   wowItem.upgradable =#{item.upgradable,jdbcType=VARCHAR},
+                   wowItem.heroicTooltip=#{item.heroicTooltip,jdbcType=VARCHAR},
+                   wowItem.context=#{item.context,jdbcType=VARCHAR},
+                   wowItem.LAST_UPDATE_DATE=sysdate,
+                   wowItem.LAST_UPDATED_BY='sys'
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              DESCRIPTION,
+              NAME,
+              ICON,
+              STACKABLE,
+              ITEMBIND,
+              BUYPRICE,
+              ITEMCLASS,
+              ITEMSUBCLASS,
+              CONTAINERSLOTS,
+              INVENTORYTYPE,
+              EQUIPPABLE,
+              ITEMLEVEL,
+              MAXCOUNT,
+              MAXDURABILITY,
+              MINFACTIONID,
+              MINREPUTATION,
+              QUALITY,
+              SELLPRICE,
+              REQUIREDSKILL,
+              REQUIREDLEVEL,
+              REQUIREDSKILLRANK,
+              BASEARMOR ,
+              HASSOCKETS,
+              ISAUCTIONABLE,
+              ARMOR,
+              DISPLAYINFOID ,
+              NAMEDESCRIPTION ,
+              NAMEDESCRIPTIONCOLOR,
+              UPGRADABLE ,
+              HEROICTOOLTIP,
+              CONTEXT,
+              CREATION_DATE,
+              CREATED_BY,
+              LAST_UPDATE_DATE,
+              LAST_UPDATED_BY
+             )
+             VALUES
+             (
+              #{item.id,jdbcType=NUMERIC},
+              #{item.description,jdbcType=VARCHAR},
+              #{item.name,jdbcType=VARCHAR},
+              #{item.icon,jdbcType=VARCHAR},
+              #{item.stackable,jdbcType=VARCHAR},
+              #{item.itemBind,jdbcType=VARCHAR},
+              #{item.buyPrice,jdbcType=VARCHAR},
+              #{item.itemClass,jdbcType=VARCHAR},
+              #{item.itemSubClass,jdbcType=VARCHAR},
+              #{item.containerSlots,jdbcType=VARCHAR},
+              #{item.inventoryType,jdbcType=VARCHAR},
+              #{item.equippable,jdbcType=VARCHAR},
+              #{item.itemLevel,jdbcType=VARCHAR},
+              #{item.maxCount,jdbcType=VARCHAR},
+              #{item.maxDurability,jdbcType=VARCHAR},
+              #{item.minFactionId,jdbcType=VARCHAR},
+              #{item.minReputation,jdbcType=VARCHAR},
+              #{item.quality,jdbcType=VARCHAR},
+              #{item.sellPrice,jdbcType=VARCHAR},
+              #{item.requiredSkill,jdbcType=VARCHAR},
+              #{item.requiredLevel,jdbcType=VARCHAR},
+              #{item.requiredSkillRank,jdbcType=VARCHAR},
+              #{item.baseArmor,jdbcType=VARCHAR},
+              #{item.hasSockets,jdbcType=VARCHAR},
+              #{item.isAuctionable,jdbcType=VARCHAR},
+              #{item.armor,jdbcType=VARCHAR},
+              #{item.displayInfoId ,jdbcType=VARCHAR},
+              #{item.nameDescription,jdbcType=VARCHAR},
+              #{item.nameDescriptionColor,jdbcType=VARCHAR},
+              #{item.upgradable ,jdbcType=VARCHAR},
+              #{item.heroicTooltip,jdbcType=VARCHAR},
+              #{item.context,jdbcType=VARCHAR},
+              sysdate,
+              'sys',
+              sysdate,
+              'sys'
+             );
+        </foreach>
+     end;
+ </insert>
+
+</mapper>  

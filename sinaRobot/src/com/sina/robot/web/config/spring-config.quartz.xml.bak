@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	
+	<!-- Quartz任务调度 -->
+	<bean name="scheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="dataSource" ref="wasDataSource"/>
+		<property name="transactionManager" ref="txManager"/>
+		<!-- 延迟30秒启动Scheduler -->
+		<property name="startupDelay" value="30"></property>
+		<property name="quartzProperties">
+			<map>
+				<!-- 调度器的实例名 -->
+				<entry key="org.quartz.scheduler.instanceName" value="WowdbScheduler"/>
+				<!-- 调度器的实例ID -->
+				<entry key="org.quartz.scheduler.instanceId" value="AUTO"/>
+				<!-- 工作者线程 -->
+				<entry key="org.quartz.threadPool.threadCount" value="10"/>
+				<entry key="org.quartz.jobStore.isClustered" value="true"/>
+				<!-- 调度器信息存储在内存中org.quartz.simpl.RAMJobStore -->
+				<entry key="org.quartz.jobStore.class" value="org.quartz.impl.jdbcjobstore.JobStoreTX"/>
+				<entry key="org.quartz.plugin.jobLoader.class" value="com.wowdb.wowdata.schedule.service.impl.SchedulerWowdbPlugin"/>
+				<entry key="org.quartz.plugin.jobLoader.jobBasePackage" value="com.wowdb.wowdata.schedule"/>
+			</map>
+		</property>
+		<!-- 通过applicationContextSchedulerContextKey属性配置spring上下文 -->
+		<property name="applicationContextSchedulerContextKey">
+			<value>applicationContext</value>
+		</property>
+	</bean>
+
+</beans>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.sina.robot.dao.IEmailRegisterDao">  
+  <insert id="insertNewEmail"  >
+	insert into reg_email 
+    (
+      id,
+      ACCOUNT,
+      PASSWORD,
+      BACKUPEMAIL,
+      FIRSTNAME,
+      LASTNAME,
+      BDAYDAY,
+      BDAYMONTH,
+      BDAYYEAR,
+      COUNTRY,
+      REGSEX,
+      ZIPCODE,
+      EMAILTYPE,
+      CREATEDDATE,
+      LASTUPDATEDATE
+    )values
+	(
+	SEQ_REG_EMAIL.NEXTVAL,
+	#{email.account,jdbcType=VARCHAR},
+	#{email.password,jdbcType=VARCHAR},
+	#{email.backupEmail,jdbcType=VARCHAR},
+	#{email.firstName,jdbcType=VARCHAR},
+	#{email.lastName,jdbcType=VARCHAR},
+	#{email.bdayDay,jdbcType=VARCHAR},
+	#{email.bdayMonth,jdbcType=VARCHAR},
+	#{email.bdayYear,jdbcType=VARCHAR},
+	#{email.country,jdbcType=VARCHAR},
+	#{email.regSex,jdbcType=VARCHAR},
+	#{email.zipCode,jdbcType=VARCHAR},
+	#{email.emailType,jdbcType=VARCHAR},
+	sysdate,
+	sysdate
+	)
+  
+  
+  </insert>
+  
+
+</mapper>  

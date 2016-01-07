@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.wowdb.wowdata.dao.api.IWowAsyncDao">  
+
+ 
+ <insert id="insertGuildToRefresh">
+       begin
+       <foreach item="item" index="index" collection="guildList">
+          MERGE INTO WOW_GUILD_TO_REFRESH GUILD
+          USING (SELECT 1 FROM DUAL) P
+          ON (GUILD.name= #{item.name} AND GUILD.REALM= #{item.realm})
+          WHEN MATCHED THEN
+          UPDATE
+               SET  GUILD.REFRESH_FLAG=0
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              NAME,
+              REALM,
+              REFRESH_FLAG,
+              FINISHED_FLAG
+              )
+             VALUES
+             (
+              SEQ_WOW_GUILD_TO_REFRESH.NEXTVAL,
+              #{item.name,jdbcType=VARCHAR},
+              #{item.realm,jdbcType=VARCHAR},
+              0,
+              0
+             );
+        </foreach>
+     end;
+ </insert>
+  
+  
+  <update id="finishGuildToRefresh">
+        UPDATE WOW_GUILD_TO_REFRESH T
+         SET T.REFRESH_FLAG=1,
+         t.FINISHED_FLAG=1,
+         t.FINISH_DATE=sysdate
+         WHERE T.ID IN 
+         <foreach item="item" index="index" collection="guildList" open="(" separator="," close=")">
+             #{item.id}
+         </foreach>
+ </update>
+ 
+ <update id="failedGuildToRefresh">
+        UPDATE WOW_GUILD_TO_REFRESH T
+         SET T.REFRESH_FLAG=-1,
+         t.FINISHED_FLAG=-1,
+         t.FINISH_DATE=sysdate
+         WHERE T.ID IN 
+         <foreach item="item" index="index" collection="guildList" open="(" separator="," close=")">
+             #{item.id}
+         </foreach>
+ </update>
+ 
+ 
+ 
+ 
+  <select id="findGuildToRefresh" resultType="com.wowdb.wowdata.GuildVO">
+       select t.id,t.name,t.realm
+        from wow_guild_to_refresh t
+        where t.refresh_flag=0
+         <![CDATA[
+         and (t.FINISHED_FLAG=0 or t.finish_date+1/2<sysdate)
+         and rownum <=#{pageSize}
+        ]]>
+  </select>
+  
+  <select id="findCharacterToRefresh" resultType="com.wowdb.wowdata.WowCharacter">
+       select t.id,t.name,t.realm
+        from WOW_CHARACTER_TO_REFRESH t
+        where t.refresh_flag=0
+         <![CDATA[
+         and (t.FINISHED_FLAG=0 or t.finish_date+1/2<sysdate)
+         and rownum <=#{pageSize}
+        ]]>
+  </select>
+  
+  <insert id="insertCharacterToRefresh">
+       begin
+       <foreach item="item" index="index" collection="characterList">
+          MERGE INTO WOW_CHARACTER_TO_REFRESH  CHARACTER
+          USING (SELECT 1 FROM DUAL) P
+          ON (CHARACTER.name= #{item.name} AND CHARACTER.REALM= #{item.realm})
+          WHEN MATCHED THEN
+          UPDATE
+               SET  CHARACTER.REFRESH_FLAG=0
+          WHEN NOT MATCHED THEN
+           INSERT  
+             (ID,
+              NAME,
+              REALM,
+              REFRESH_FLAG,
+              FINISHED_FLAG
+              )
+             VALUES
+             (
+              SEQ_WOW_CHARACTER_TO_REFRESH.NEXTVAL,
+              #{item.name,jdbcType=VARCHAR},
+              #{item.realm,jdbcType=VARCHAR},
+              0,
+              0
+             );
+        </foreach>
+     end;
+ </insert>
+  <update id="finishCharacterToRefresh">
+        UPDATE WOW_CHARACTER_TO_REFRESH T
+         SET T.REFRESH_FLAG=1,
+         t.FINISHED_FLAG=1,
+         t.FINISH_DATE=sysdate
+         WHERE T.ID IN 
+         <foreach item="item" index="index" collection="characterList" open="(" separator="," close=")">
+             #{item.id}
+         </foreach>
+ </update>
+ <update id="failedCharacterToRefresh">
+        UPDATE WOW_CHARACTER_TO_REFRESH T
+         SET T.REFRESH_FLAG=-1,
+         t.FINISHED_FLAG=-1,
+         t.FINISH_DATE=sysdate
+         WHERE T.ID IN 
+         <foreach item="item" index="index" collection="characterList" open="(" separator="," close=")">
+             #{item.id}
+         </foreach>
+ </update>
+  <select id="findGudAchComToRefresh" resultType="com.wowdb.wowdata.GuildVO">
+       select t.id,t.name,t.realm
+        from wow_guild_to_refresh t
+        where t.refresh_flag=0
+         <![CDATA[
+         and (t.FINISHED_FLAG=0 or t.finish_date+1/2<sysdate)
+         and rownum <=#{pageSize}
+        ]]>
+  </select>
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+</mapper>  
