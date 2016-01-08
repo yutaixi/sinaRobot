@@ -29,7 +29,7 @@ public class WeiboSynTask extends TimerTask{
 			// 对登陆微博的帐号、密码、uid的设置
 				LoginPojo loginPojo = new LoginPojo();
 				loginPojo.setUsername("dageboclub@sina.com");
-				loginPojo.setPassword("Ydh515844094718");
+				loginPojo.setPassword("");
 				loginPojo.setNicName("大胳膊俱乐部");
 				loginPojo.setDelay(60*5);
 				List<WeiboItem> jobs=iWeiboRobotDao.hasJobRunning(loginPojo);
