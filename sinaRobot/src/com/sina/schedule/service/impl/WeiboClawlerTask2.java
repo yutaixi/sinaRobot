@@ -30,7 +30,7 @@ public class WeiboClawlerTask2 extends TimerTask{
 			// 对登陆微博的帐号、密码、uid的设置
 				LoginPojo loginPojo = new LoginPojo();
 				loginPojo.setUsername("tiantianyoumo001@sina.com");
-				loginPojo.setPassword("1937294381");
+				loginPojo.setPassword("");
 				loginPojo.setNicName("重口味幽默笑话大全");
 				WeiboCrawler weiboCrawler=new WeiboCrawler();
 				weiboCrawler.setType("joke");
