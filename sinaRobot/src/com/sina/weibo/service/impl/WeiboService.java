@@ -125,7 +125,7 @@ public class WeiboService implements IWeiboService{
 		// 对登陆微博的帐号、密码、uid的设置
 		LoginPojo loginPojo = new LoginPojo(); 
 		loginPojo.setUsername("dageboclub@sina.com");
-		loginPojo.setPassword("Ydh515844094718");
+		loginPojo.setPassword("");
 		WeiboService weiboService=new WeiboService();
 		weiboService.login(loginPojo);
 //		weiboService.follow("1663073073");
